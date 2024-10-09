@@ -62,7 +62,6 @@ const UsersTable: React.FC = () => {
             filteredUsers.map((user) => (
               <>
                 <TableUserBody key={user.id} user={user} />
-                <TableUserBody key={user.id} user={user} />
               </>
             ))
           )}

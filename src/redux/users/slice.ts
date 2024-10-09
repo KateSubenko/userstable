@@ -6,7 +6,7 @@ import { fetchUsers } from "./thunks";
 export interface IState {
   users: IUsersTypes[];
   filteredUsers: IUsersTypes[];
-  loading: Loading.IDLE | Loading.PENDING | Loading.SUCCEEDED | Loading.FAILED;
+  loading: Loading;
   error?: string | null;
   filters: {
     name: string | null;
@@ -34,31 +34,38 @@ const usersSlice = createSlice({
   initialState,
   reducers: {
     setFilters: (state, action) => {
+      const { name, username, phone, email } = action.payload;
       state.filters = action.payload;
-      state.filteredUsers = state.users.filter(
-        (user) =>
-          user.name.toLowerCase().includes(action.payload.name.toLowerCase()) &&
-          user.username
-            .toLowerCase()
-            .includes(action.payload.username.toLowerCase()) &&
-          user.phone.includes(action.payload.phone) &&
-          user.email.toLowerCase().includes(action.payload.email.toLowerCase())
-      );
+      state.filteredUsers = state.users.filter((user) => {
+        const matchesName = name
+          ? user.name.toLowerCase().includes(name.toLowerCase())
+          : true;
+        const matchesUsername = username
+          ? user.username.toLowerCase().includes(username.toLowerCase())
+          : true;
+        const matchesPhone = phone ? user.phone.includes(phone) : true;
+        const matchesEmail = email
+          ? user.email.toLowerCase().includes(email.toLowerCase())
+          : true;
+
+        return matchesName && matchesUsername && matchesPhone && matchesEmail;
+      });
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUsers.pending, (state, _) => {
+      .addCase(fetchUsers.pending, (state) => {
         state.loading = Loading.PENDING;
+        state.error = null;
       })
       .addCase(fetchUsers.fulfilled, (state, { payload }) => {
         state.loading = Loading.SUCCEEDED;
-        state.users = payload as IUsersTypes[];
-        state.filteredUsers = payload as IUsersTypes[];
+        state.users = payload;
+        state.filteredUsers = payload;
       })
-      .addCase(fetchUsers.rejected, (state, { error }) => {
+      .addCase(fetchUsers.rejected, (state, { payload }) => {
         state.loading = Loading.FAILED;
-        state.error = error.message;
+        state.error = payload as string;
       });
   },
 });

@@ -1,5 +1,5 @@
 import { TextField } from "@mui/material";
-import { ChangeEvent, useState, useMemo } from "react";
+import { useState, useEffect } from "react";
 
 interface SearchUsersInputT {
   id: string;
@@ -16,7 +16,7 @@ const SearchUsersInput: React.FC<SearchUsersInputT> = ({
 }) => {
   const [textValue, setTextValue] = useState(defaultValue);
 
-  useMemo(() => {
+  useEffect(() => {
     setTextValue(defaultValue);
   }, [defaultValue]);
 
